@@ -3,8 +3,27 @@ from matplotlib.colors import LinearSegmentedColormap
 from scipy.interpolate import interpolate
 from shapely import affinity
 import matplotlib.pyplot as plt
-from shapely.geometry import LineString
-from shape_functions import *
+import numpy as np
+import numpy.random as random
+from shapely.geometry import (
+    MultiPolygon,
+    Point,
+    Polygon,
+    LineString,
+)
+from shape_functions import (
+    copy_shape,
+    get_bounding_rectangle_center,
+    copy,
+    Circle,
+    Ellipse,
+    does_shape_contain_other,
+    do_shapes_intersect,
+    get_bounds,
+    get_intersection_points_between_shapes,
+    get_shape_exterior_points,
+    get_centroid,
+)
 
 
 # set plotting font and sizes
