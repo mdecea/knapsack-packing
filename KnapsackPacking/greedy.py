@@ -73,9 +73,18 @@ def select_item(items_with_profit_ratio):
     return lowest
 
 
-def solve_problem(problem, greedy_score_function=get_weighted_sum_of_item_value_and_profitability_ratio, value_weight=VALUE_WEIGHT, area_weight=AREA_WEIGHT, max_iter_num=MAX_ITER_NUM, max_iter_num_without_changes=MAX_ITER_NUM_WITHOUT_CHANGES, repetition_num=REPETITION_NUM, item_index_to_place_first=-1, item_specialization_iter_proportion=0., calculate_times=False, return_value_evolution=False):
+def solve_problem(problem, 
+                  greedy_score_function=get_weighted_sum_of_item_value_and_profitability_ratio,
+                  value_weight=VALUE_WEIGHT, area_weight=AREA_WEIGHT, 
+                  max_iter_num=MAX_ITER_NUM, max_iter_num_without_changes=MAX_ITER_NUM_WITHOUT_CHANGES,
+                  repetition_num=REPETITION_NUM, item_index_to_place_first=-1,
+                  item_specialization_iter_proportion=0., calculate_times=False, return_value_evolution=False,
+                  rotation="none"):
 
-    """Find and return a solution to the passed problem, using a greedy strategy"""
+    """Find and return a solution to the passed problem, using a greedy strategy.
+    
+    rotation: either "none" (no rotation allowed), "free" (any rotation allowed) 
+        or "manhattan" (0, 90, 180, 270 allowed) """
 
     # determine the bounds of the container
     min_x, min_y, max_x, max_y = get_bounds(problem.container.shape)
@@ -104,7 +113,9 @@ def solve_problem(problem, greedy_score_function=get_weighted_sum_of_item_value_
         start_time = time.time()
 
     # sort items (with greedy score calculated) by weight, to speed up their discarding (when they would cause the capacity to be exceeded)
-    original_items_by_weight = [(index_item_tuple[0], greedy_score_function(index_item_tuple[1], value_weight, area_weight), index_item_tuple[1]) for index_item_tuple in sorted(list(problem.items.items()), key=lambda index_item_tuple: index_item_tuple[1].weight)]
+    original_items_by_weight = [(index_item_tuple[0], greedy_score_function(index_item_tuple[1],
+                                                                            value_weight, area_weight),
+                                 index_item_tuple[1]) for index_item_tuple in sorted(list(problem.items.items()), key=lambda index_item_tuple: index_item_tuple[1].weight)]
 
     if calculate_times:
         sort_time += get_time_since(start_time)
@@ -148,7 +159,8 @@ def solve_problem(problem, greedy_score_function=get_weighted_sum_of_item_value_
                     item_index = item_index_to_place_first
                     list_index = -1
 
-                # perform a random choice of the next item to try to place, weighting each item with their profitability ratio, that acts as an stochastic selection probability
+                # perform a random choice of the next item to try to place, weighting each
+                # item with their profitability ratio, that acts as an stochastic selection probability
                 else:
                     list_index = select_item(items_by_weight)
                     item_index = items_by_weight[list_index][0]
@@ -160,7 +172,13 @@ def solve_problem(problem, greedy_score_function=get_weighted_sum_of_item_value_
                     start_time = time.time()
 
                 # try to add the item in a random position and with a random rotation; if it is valid, remove the item from the pending list
-                if solution.add_item(item_index, (random.uniform(min_x, max_x), random.uniform(min_y, max_y)), random.uniform(0, 360)):
+                if rotation == "none":
+                    rot = 0
+                elif rotation == "free":
+                    rot = random.uniform(0, 360)
+                elif rotation == "manhattan":
+                    rot = random.choice([0, 90, 180, 270])
+                if solution.add_item(item_index, (random.uniform(min_x, max_x), random.uniform(min_y, max_y)), rot):
 
                     # the item to place first is assumed to have been placed, if there was any
                     item_index_to_place_first = -1
