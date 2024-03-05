@@ -20,7 +20,7 @@ MAX_ITER_NUM_WITHOUT_CHANGES = 30000
 # default number of repetitions of the algorithm
 REPETITION_NUM = 1
 
-# whether the constant score can be used if explicitely indicated
+# whether the constant score can be used if explicitly indicated
 CAN_USE_CONSTANT_SCORE = True
 
 

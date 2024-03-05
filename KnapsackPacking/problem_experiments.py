@@ -1179,9 +1179,8 @@ def visualize_and_save_experiments(
                 for algorithm_name, subdict in algorithm_dict.items():
                     for i, value_evolution in enumerate(subdict["value_evolutions"]):
                         if value_evolution:
-                            if (
-                                type(value_evolution) == list
-                                and type(value_evolution[0]) == list
+                            if isinstance(value_evolution, list) and isinstance(
+                                value_evolution[0], list
                             ):
                                 visualize_boxplot_for_data_sequence(
                                     data_lists=value_evolution,
