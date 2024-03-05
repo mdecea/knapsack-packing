@@ -396,85 +396,85 @@ def create_packing_problems_with_optimal_solution_values():
     # the capacity is set to infinite so that it never restricts placements; all items have value 1 so that the objective is to maximize the number of placed items
     max_weight = np.inf
 
-    # Circles in circle; Wolfram Alpha query: "pack 7 circles of radius 3.9 in a circle of radius 13"; full link: https://www.wolframalpha.com/input/?i=pack+7+circles+of+radius+3.9+in+a+circle+of+radius+13
-    container_shape = Circle((13, 13), 13)
-    container = Container(max_weight, container_shape)
-    item_num = 7
-    items = [Item(Circle((0, 0), 3.9), 1., 1.)] * item_num
-    problem = Problem(container, items)
-    problems.append(problem)
-    problem_names.append("Circles in circle")
-    optimal_values.append(item_num)
+    # # Circles in circle; Wolfram Alpha query: "pack 7 circles of radius 3.9 in a circle of radius 13"; full link: https://www.wolframalpha.com/input/?i=pack+7+circles+of+radius+3.9+in+a+circle+of+radius+13
+    # container_shape = Circle((13, 13), 13)
+    # container = Container(max_weight, container_shape)
+    # item_num = 7
+    # items = [Item(Circle((0, 0), 3.9), 1., 1.)] * item_num
+    # problem = Problem(container, items)
+    # problems.append(problem)
+    # problem_names.append("Circles in circle")
+    # optimal_values.append(item_num)
 
-    # Triangles in circle; Wolfram Alpha query: "pack 20 triangles of side 4 in a circle of radius 9.5"; full link: https://www.wolframalpha.com/input/?i=pack+20+triangles+of+side+4+in+a+circle+of+radius+9.5
-    container_shape = Circle((9.5, 9.5), 9.5)
-    container = Container(max_weight, container_shape)
-    item_num = 20
-    items = [Item(shape_functions.create_equilateral_triangle((0, 0), 4), 1., 1.)] * item_num
-    problem = Problem(container, items)
-    problems.append(problem)
-    problem_names.append("Triangles in circle")
-    optimal_values.append(item_num)
+    # # Triangles in circle; Wolfram Alpha query: "pack 20 triangles of side 4 in a circle of radius 9.5"; full link: https://www.wolframalpha.com/input/?i=pack+20+triangles+of+side+4+in+a+circle+of+radius+9.5
+    # container_shape = Circle((9.5, 9.5), 9.5)
+    # container = Container(max_weight, container_shape)
+    # item_num = 20
+    # items = [Item(shape_functions.create_equilateral_triangle((0, 0), 4), 1., 1.)] * item_num
+    # problem = Problem(container, items)
+    # problems.append(problem)
+    # problem_names.append("Triangles in circle")
+    # optimal_values.append(item_num)
 
-    # Squares in circle; Wolfram Alpha query: "pack 12 squares of side 3 in a circle of radius 7.8"; full link: https://www.wolframalpha.com/input/?i=pack+12+squares+of+side+3+in+a+circle+of+radius+7.8
-    container_shape = Circle((7.8, 7.8), 7.8)
-    container = Container(max_weight, container_shape)
-    item_num = 12
-    items = [Item(shape_functions.create_square((0, 0), 3), 1., 1.)] * item_num
-    problem = Problem(container, items)
-    problems.append(problem)
-    problem_names.append("Squares in circle")
-    optimal_values.append(item_num)
+    # # Squares in circle; Wolfram Alpha query: "pack 12 squares of side 3 in a circle of radius 7.8"; full link: https://www.wolframalpha.com/input/?i=pack+12+squares+of+side+3+in+a+circle+of+radius+7.8
+    # container_shape = Circle((7.8, 7.8), 7.8)
+    # container = Container(max_weight, container_shape)
+    # item_num = 12
+    # items = [Item(shape_functions.create_square((0, 0), 3), 1., 1.)] * item_num
+    # problem = Problem(container, items)
+    # problems.append(problem)
+    # problem_names.append("Squares in circle")
+    # optimal_values.append(item_num)
 
-    # Circles in triangle; Wolfram Alpha query: "pack 10 circles of radius 3 in a triangle of side 33"; full link: https://www.wolframalpha.com/input/?i=pack+10+circles+of+radius+3+in+a+triangle+of+side+33
-    container_shape = shape_functions.create_equilateral_triangle((19, 9.5), 33)
-    container = Container(max_weight, container_shape)
-    item_num = 10
-    items = [Item(Circle((0, 0), 3), 1., 1.)] * item_num
-    problem = Problem(container, items)
-    problems.append(problem)
-    problem_names.append("Circles in triangle")
-    optimal_values.append(item_num)
+    # # Circles in triangle; Wolfram Alpha query: "pack 10 circles of radius 3 in a triangle of side 33"; full link: https://www.wolframalpha.com/input/?i=pack+10+circles+of+radius+3+in+a+triangle+of+side+33
+    # container_shape = shape_functions.create_equilateral_triangle((19, 9.5), 33)
+    # container = Container(max_weight, container_shape)
+    # item_num = 10
+    # items = [Item(Circle((0, 0), 3), 1., 1.)] * item_num
+    # problem = Problem(container, items)
+    # problems.append(problem)
+    # problem_names.append("Circles in triangle")
+    # optimal_values.append(item_num)
 
-    # Triangles in triangle; Wolfram Alpha query: "pack 18 triangles of side 3.5 in a triangle of side 20"; full link: https://www.wolframalpha.com/input/?i=pack+18+triangles+of+side+3.5+in+a+triangle+of+side+20
-    container_shape = shape_functions.create_equilateral_triangle((12, 6), 20)
-    container = Container(max_weight, container_shape)
-    item_num = 18
-    items = [Item(shape_functions.create_equilateral_triangle((0, 0), 3.5), 1., 1.)] * item_num
-    problem = Problem(container, items)
-    problems.append(problem)
-    problem_names.append("Triangles in triangle")
-    optimal_values.append(item_num)
+    # # Triangles in triangle; Wolfram Alpha query: "pack 18 triangles of side 3.5 in a triangle of side 20"; full link: https://www.wolframalpha.com/input/?i=pack+18+triangles+of+side+3.5+in+a+triangle+of+side+20
+    # container_shape = shape_functions.create_equilateral_triangle((12, 6), 20)
+    # container = Container(max_weight, container_shape)
+    # item_num = 18
+    # items = [Item(shape_functions.create_equilateral_triangle((0, 0), 3.5), 1., 1.)] * item_num
+    # problem = Problem(container, items)
+    # problems.append(problem)
+    # problem_names.append("Triangles in triangle")
+    # optimal_values.append(item_num)
 
-    # Squares in triangle; Wolfram Alpha query: "pack 30 squares of side 7.5 in a triangle of side 80"; full link: https://www.wolframalpha.com/input/?i=pack+24+squares+of+side+7.5+in+a+triangle+of+side+80
-    container_shape = shape_functions.create_equilateral_triangle((49, 24.5), 80)
-    container = Container(max_weight, container_shape)
-    item_num = 30
-    items = [Item(shape_functions.create_square((0, 0), 7.5), 1., 1.)] * item_num
-    problem = Problem(container, items)
-    problems.append(problem)
-    problem_names.append("Squares in triangle")
-    optimal_values.append(item_num)
+    # # Squares in triangle; Wolfram Alpha query: "pack 30 squares of side 7.5 in a triangle of side 80"; full link: https://www.wolframalpha.com/input/?i=pack+24+squares+of+side+7.5+in+a+triangle+of+side+80
+    # container_shape = shape_functions.create_equilateral_triangle((49, 24.5), 80)
+    # container = Container(max_weight, container_shape)
+    # item_num = 30
+    # items = [Item(shape_functions.create_square((0, 0), 7.5), 1., 1.)] * item_num
+    # problem = Problem(container, items)
+    # problems.append(problem)
+    # problem_names.append("Squares in triangle")
+    # optimal_values.append(item_num)
 
-    # Circles in square; Wolfram Alpha query: "pack 50 circles of radius 17 in a square of side 300"; full link https://www.wolframalpha.com/input/?i=pack+50+circles+of+radius+17+in+a+square+of+side+300:
-    container_shape = shape_functions.create_square((150, 150), 300)
-    container = Container(max_weight, container_shape)
-    item_num = 50
-    items = [Item(Circle((0, 0), 17), 1., 1.)] * item_num
-    problem = Problem(container, items)
-    problems.append(problem)
-    problem_names.append("Circles in square")
-    optimal_values.append(item_num)
+    # # Circles in square; Wolfram Alpha query: "pack 50 circles of radius 17 in a square of side 300"; full link https://www.wolframalpha.com/input/?i=pack+50+circles+of+radius+17+in+a+square+of+side+300:
+    # container_shape = shape_functions.create_square((150, 150), 300)
+    # container = Container(max_weight, container_shape)
+    # item_num = 50
+    # items = [Item(Circle((0, 0), 17), 1., 1.)] * item_num
+    # problem = Problem(container, items)
+    # problems.append(problem)
+    # problem_names.append("Circles in square")
+    # optimal_values.append(item_num)
 
-    # Triangles in square; Wolfram Alpha query: "pack 15 triangles of side 4 in a square of side 14"; full link: https://www.wolframalpha.com/input/?i=pack+15+triangles+of+side+4+in+a+square+of+side+14
-    container_shape = shape_functions.create_square((7, 7), 14)
-    container = Container(max_weight, container_shape)
-    item_num = 15
-    items = [Item(shape_functions.create_equilateral_triangle((0, 0), 4), 1., 1.)] * item_num
-    problem = Problem(container, items)
-    problems.append(problem)
-    problem_names.append("Triangles in square")
-    optimal_values.append(item_num)
+    # # Triangles in square; Wolfram Alpha query: "pack 15 triangles of side 4 in a square of side 14"; full link: https://www.wolframalpha.com/input/?i=pack+15+triangles+of+side+4+in+a+square+of+side+14
+    # container_shape = shape_functions.create_square((7, 7), 14)
+    # container = Container(max_weight, container_shape)
+    # item_num = 15
+    # items = [Item(shape_functions.create_equilateral_triangle((0, 0), 4), 1., 1.)] * item_num
+    # problem = Problem(container, items)
+    # problems.append(problem)
+    # problem_names.append("Triangles in square")
+    # optimal_values.append(item_num)
 
     # Squares in square; Wolfram Alpha query: "pack 100 squares of side 4 in a square of side 58"; full link: https://www.wolframalpha.com/input/?i=pack+100+squares+of+side+4+in+a+square+of+side+58
     container_shape = shape_functions.create_square((22.5, 22.5), 58)
@@ -598,8 +598,8 @@ def perform_experiments(problem_type, output_dir, load_experiments):
         if problems and problem_names and manual_solutions:
 
             # parameters for the experimentation; note: calculating internal times and value evolution can increase the overall time of algorithms (in a slight, almost neglectible way)
-            execution_num = 10  # 1
-            process_num = 10  # 1
+            execution_num = 1  # 10
+            process_num = 1  # 10
             calculate_internal_times = True
             calculate_value_evolution = True
 
@@ -612,7 +612,7 @@ def perform_experiments(problem_type, output_dir, load_experiments):
 
                 # solve the problem with different algorithms, executing each one multiple times to gain statistical significance
                 for (algorithm_name, algorithm) in [("Greedy", greedy.solve_problem), ("Reversible", reversible.solve_problem), ("Evolutionary", evolutionary.solve_problem)]:
-
+                    print(f"Starting {algorithm_name}")
                     solutions, values, value_evolutions, times, time_divisions = execute_algorithm(algorithm=algorithm, algorithm_name=algorithm_name, problem=problem, execution_num=execution_num, process_num=process_num, calculate_times=calculate_internal_times, calculate_fitness_stats=calculate_value_evolution)
                     experiment_dict[problem_name]["algorithms"][algorithm_name] = {"solutions": solutions, "values": values, "value_evolutions": value_evolutions, "times": times, "time_divisions": time_divisions}
 
@@ -634,7 +634,7 @@ def perform_experiments(problem_type, output_dir, load_experiments):
         save_problem_stats = False  # True
         show_manual_solution_plots = False
         save_manual_solution_plots = False  # True
-        show_algorithm_solution_plots = False
+        show_algorithm_solution_plots = True
         save_algorithm_solution_plots = False  # True
         show_value_evolution_plots = False
         save_value_evolution_plots = False  # True
@@ -782,7 +782,7 @@ def main():
     problem_type, output_dir = PACKING_PROBLEM_TYPE, PACKING_PROBLEM_DIR
 
     # whether it should be attempted to load existing experiments, and avoid running new ones
-    load_experiments = True
+    load_experiments = False
 
     # perform (or just load and show) a set of experiments
     perform_experiments(problem_type, output_dir, load_experiments)
