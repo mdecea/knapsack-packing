@@ -9,9 +9,7 @@ RESOLUTION = 16
 
 
 class Ellipse(BaseGeometry):
-
     def __init__(self, center, half_width, half_height, polygon=None):
-
         """Constructor"""
 
         if type(center) != Point:
@@ -24,28 +22,27 @@ class Ellipse(BaseGeometry):
         # approximate the ellipse as a polygon to avoid having to define checks (intersection, is-within) with all other shapes
         circle_approximation = center.buffer(1, resolution=RESOLUTION)
         if not polygon:
-            polygon = affinity.scale(circle_approximation, self.half_width, self.half_height)
+            polygon = affinity.scale(
+                circle_approximation, self.half_width, self.half_height
+            )
         self.polygon = polygon
 
     def __reduce__(self):
         return Ellipse, (self.center, self.half_width, self.half_height, self.polygon)
 
     def intersects(self, other):
-
         """Returns True if geometries intersect, else False"""
 
         # use the approximate polygon for the check
         return problem_solution.do_shapes_intersect(self.polygon, other)
 
     def within(self, other):
-
         """Returns True if geometry is within the other, else False"""
 
         # use the approximate polygon for the check
         return problem_solution.does_shape_contain_other(other, self.polygon)
 
     def contains(self, other):
-
         """Returns True if the geometry contains the other, else False"""
 
         # use the approximate polygon for the check
@@ -53,7 +50,6 @@ class Ellipse(BaseGeometry):
 
     @property
     def area(self):
-
         """Unitless area of the geometry (float)"""
 
         return np.pi * self.half_width * self.half_height
@@ -77,5 +73,5 @@ class Ellipse(BaseGeometry):
     def __geo_interface__(self):
         return None
 
-    def svg(self, scale_factor=1., **kwargs):
+    def svg(self, scale_factor=1.0, **kwargs):
         return None

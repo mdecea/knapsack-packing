@@ -24,37 +24,48 @@ REPETITION_NUM = 1
 CAN_USE_CONSTANT_SCORE = True
 
 
-def get_constant_score(item, value_weight, area_weight, can_use_constant_score=CAN_USE_CONSTANT_SCORE):
-
+def get_constant_score(
+    item, value_weight, area_weight, can_use_constant_score=CAN_USE_CONSTANT_SCORE
+):
     """Return a constant score regardless of the item's characteristics or any weighting, if allowed"""
 
     if can_use_constant_score:
         return 1
 
-    return get_weighted_sum_of_item_value_and_profitability_ratio(item, value_weight, area_weight)
+    return get_weighted_sum_of_item_value_and_profitability_ratio(
+        item, value_weight, area_weight
+    )
 
 
 def get_item_profitability_ratio(item, area_weight):
-
     """Return the profitability ratio of an item"""
 
     # the ratio is the value of the item divided by a weighted product of the weight and the shape's area
-    return item.value / ((1. - area_weight) * item.weight + area_weight * item.shape.area)
+    return item.value / (
+        (1.0 - area_weight) * item.weight + area_weight * item.shape.area
+    )
 
 
-def get_weighted_sum_of_item_value_and_profitability_ratio(item, value_weight, area_weight):
-
+def get_weighted_sum_of_item_value_and_profitability_ratio(
+    item, value_weight, area_weight
+):
     """Return weighted sum of the value and the profitability ratio of an item"""
 
-    return value_weight * item.value + (1. - value_weight) * get_item_profitability_ratio(item, area_weight)
+    return value_weight * item.value + (
+        1.0 - value_weight
+    ) * get_item_profitability_ratio(item, area_weight)
 
 
 def select_item(items_with_profit_ratio):
-
     """Given a list of tuples of the form (item_index, item_profitability_ratio, item), select an item proportionally to its profitability ratio, and return its index"""
 
     # find the cumulative profitability ratios, code based on random.choices() from the standard library of Python
-    cumulative_profit_ratios = list(itertools.accumulate(item_with_profit_ratio[1] for item_with_profit_ratio in items_with_profit_ratio))
+    cumulative_profit_ratios = list(
+        itertools.accumulate(
+            item_with_profit_ratio[1]
+            for item_with_profit_ratio in items_with_profit_ratio
+        )
+    )
     profit_ratio_sum = cumulative_profit_ratios[-1]
 
     # randomly select a ratio within the range of the sum
@@ -73,23 +84,31 @@ def select_item(items_with_profit_ratio):
     return lowest
 
 
-def solve_problem(problem, 
-                  greedy_score_function=get_weighted_sum_of_item_value_and_profitability_ratio,
-                  value_weight=VALUE_WEIGHT, area_weight=AREA_WEIGHT, 
-                  max_iter_num=MAX_ITER_NUM, max_iter_num_without_changes=MAX_ITER_NUM_WITHOUT_CHANGES,
-                  repetition_num=REPETITION_NUM, item_index_to_place_first=-1,
-                  item_specialization_iter_proportion=0., calculate_times=False, return_value_evolution=False,
-                  rotation="none"):
-
+def solve_problem(
+    problem,
+    greedy_score_function=get_weighted_sum_of_item_value_and_profitability_ratio,
+    value_weight=VALUE_WEIGHT,
+    area_weight=AREA_WEIGHT,
+    max_iter_num=MAX_ITER_NUM,
+    max_iter_num_without_changes=MAX_ITER_NUM_WITHOUT_CHANGES,
+    repetition_num=REPETITION_NUM,
+    item_index_to_place_first=-1,
+    item_specialization_iter_proportion=0.0,
+    calculate_times=False,
+    return_value_evolution=False,
+    rotation="none",
+):
     """Find and return a solution to the passed problem, using a greedy strategy.
-    
-    rotation: either "none" (no rotation allowed), "free" (any rotation allowed) 
-        or "manhattan" (0, 90, 180, 270 allowed) """
+
+    rotation: either "none" (no rotation allowed), "free" (any rotation allowed)
+        or "manhattan" (0, 90, 180, 270 allowed)"""
 
     # determine the bounds of the container
     min_x, min_y, max_x, max_y = get_bounds(problem.container.shape)
 
-    max_item_specialization_iter_num = item_specialization_iter_proportion * max_iter_num
+    max_item_specialization_iter_num = (
+        item_specialization_iter_proportion * max_iter_num
+    )
 
     start_time = 0
     sort_time = 0
@@ -113,9 +132,17 @@ def solve_problem(problem,
         start_time = time.time()
 
     # sort items (with greedy score calculated) by weight, to speed up their discarding (when they would cause the capacity to be exceeded)
-    original_items_by_weight = [(index_item_tuple[0], greedy_score_function(index_item_tuple[1],
-                                                                            value_weight, area_weight),
-                                 index_item_tuple[1]) for index_item_tuple in sorted(list(problem.items.items()), key=lambda index_item_tuple: index_item_tuple[1].weight)]
+    original_items_by_weight = [
+        (
+            index_item_tuple[0],
+            greedy_score_function(index_item_tuple[1], value_weight, area_weight),
+            index_item_tuple[1],
+        )
+        for index_item_tuple in sorted(
+            list(problem.items.items()),
+            key=lambda index_item_tuple: index_item_tuple[1].weight,
+        )
+    ]
 
     if calculate_times:
         sort_time += get_time_since(start_time)
@@ -124,7 +151,11 @@ def solve_problem(problem,
         start_time = time.time()
 
     # discard the items that would make the capacity of the container to be exceeded
-    original_items_by_weight = original_items_by_weight[:get_index_after_weight_limit(original_items_by_weight, problem.container.max_weight)]
+    original_items_by_weight = original_items_by_weight[
+        : get_index_after_weight_limit(
+            original_items_by_weight, problem.container.max_weight
+        )
+    ]
 
     if calculate_times:
         item_discarding_time += get_time_since(start_time)
@@ -133,7 +164,6 @@ def solve_problem(problem,
 
     # if the algorithm is iterated, it is repeated and the best solution is kept in the end
     for _ in range(repetition_num):
-
         # if the algorithm is iterated, use a copy of the initial sorted items, to start fresh next time
         if repetition_num > 1:
             items_by_weight = copy.deepcopy(original_items_by_weight)
@@ -145,17 +175,18 @@ def solve_problem(problem,
 
         # placements can only be possible with capacity and valid items
         if problem.container.max_weight and items_by_weight:
-
             iter_count_without_changes = 0
 
             # try to add items to the container, for a maximum number of iterations
             for i in range(max_iter_num):
-
                 if calculate_times:
                     start_time = time.time()
 
                 # if needed, select a specific item to try to place (only for a maximum number of attempts)
-                if item_index_to_place_first >= 0 and i < max_item_specialization_iter_num:
+                if (
+                    item_index_to_place_first >= 0
+                    and i < max_item_specialization_iter_num
+                ):
                     item_index = item_index_to_place_first
                     list_index = -1
 
@@ -178,8 +209,11 @@ def solve_problem(problem,
                     rot = random.uniform(0, 360)
                 elif rotation == "manhattan":
                     rot = random.choice([0, 90, 180, 270])
-                if solution.add_item(item_index, (random.uniform(min_x, max_x), random.uniform(min_y, max_y)), rot):
-
+                if solution.add_item(
+                    item_index,
+                    (random.uniform(min_x, max_x), random.uniform(min_y, max_y)),
+                    rot,
+                ):
                     # the item to place first is assumed to have been placed, if there was any
                     item_index_to_place_first = -1
 
@@ -208,7 +242,11 @@ def solve_problem(problem,
                         start_time = time.time()
 
                     # discard the items that would make the capacity of the container to be exceeded
-                    items_by_weight = items_by_weight[:get_index_after_weight_limit(items_by_weight, remaining_weight)]
+                    items_by_weight = items_by_weight[
+                        : get_index_after_weight_limit(
+                            items_by_weight, remaining_weight
+                        )
+                    ]
 
                     if calculate_times:
                         item_discarding_time += get_time_since(start_time)
@@ -221,7 +259,6 @@ def solve_problem(problem,
                     iter_count_without_changes = 0
 
                 else:
-
                     if calculate_times:
                         addition_time += get_time_since(start_time)
 
@@ -229,11 +266,13 @@ def solve_problem(problem,
                     iter_count_without_changes += 1
 
                     # stop early if there have been too many iterations without changes (unless a specific item is tried to be placed first)
-                    if iter_count_without_changes >= max_iter_num_without_changes and item_index_to_place_first < 0:
+                    if (
+                        iter_count_without_changes >= max_iter_num_without_changes
+                        and item_index_to_place_first < 0
+                    ):
                         break
 
                 if return_value_evolution:
-
                     if calculate_times:
                         start_time = time.time()
 
@@ -248,8 +287,35 @@ def solve_problem(problem,
 
     # encapsulate all times informatively in a dictionary
     if calculate_times:
-        approx_total_time = sort_time + item_selection_time + item_discarding_time + addition_time + value_evolution_time
-        time_dict = {"Weight-sort and profit ratio calculation": (sort_time, sort_time / approx_total_time), "Stochastic item selection": (item_selection_time, item_selection_time / approx_total_time), "Item discarding": (item_discarding_time, item_discarding_time / approx_total_time), "Addition and geometric validation": (addition_time, addition_time / approx_total_time), "Keeping value of each iteration": (value_evolution_time, value_evolution_time / approx_total_time)}
+        approx_total_time = (
+            sort_time
+            + item_selection_time
+            + item_discarding_time
+            + addition_time
+            + value_evolution_time
+        )
+        time_dict = {
+            "Weight-sort and profit ratio calculation": (
+                sort_time,
+                sort_time / approx_total_time,
+            ),
+            "Stochastic item selection": (
+                item_selection_time,
+                item_selection_time / approx_total_time,
+            ),
+            "Item discarding": (
+                item_discarding_time,
+                item_discarding_time / approx_total_time,
+            ),
+            "Addition and geometric validation": (
+                addition_time,
+                addition_time / approx_total_time,
+            ),
+            "Keeping value of each iteration": (
+                value_evolution_time,
+                value_evolution_time / approx_total_time,
+            ),
+        }
         if return_value_evolution:
             return best_solution, time_dict, value_evolution
         return best_solution, time_dict

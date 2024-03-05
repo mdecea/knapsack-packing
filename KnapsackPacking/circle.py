@@ -11,9 +11,7 @@ INTERSECTION_POINT_RESOLUTION = 6
 
 
 class Circle(BaseGeometry):
-
     def __init__(self, center, radius):
-
         """Constructor"""
 
         self.center = center
@@ -22,27 +20,24 @@ class Circle(BaseGeometry):
         self.radius = radius
 
         # approximate polygon used only when specific intersection points with other shapes need to be found, while the real circle formulae are used for most calculus (including intersection/contains/within checks)
-        self.polygon = self.center.buffer(self.radius, resolution=INTERSECTION_POINT_RESOLUTION)
+        self.polygon = self.center.buffer(
+            self.radius, resolution=INTERSECTION_POINT_RESOLUTION
+        )
 
     def __reduce__(self):
         return Circle, (self.center, self.radius)
 
     def intersects(self, other):
-
         """Returns True if geometries intersect, else False"""
 
         # two circles intersect if the distance between their center is no greater than the sum of their radii
         if type(other) == Circle:
-
             return self.center.distance(other.center) <= self.radius + other.radius
 
         # a circle intersects with a multi-polygon if it intersects with any of the composing polygons, either exterior or hole
         if type(other) == MultiPolygon:
-
             for geom in other.geoms:
-
                 if self.intersects(geom):
-
                     return True
 
             return False
@@ -55,25 +50,22 @@ class Circle(BaseGeometry):
         return other.distance(self.center) <= self.radius
 
     def within(self, other):
-
         """Returns True if geometry is within the other, else False"""
 
         # one circle is contained by another circle if the second one has greater radius and the center-to-center distance plus the sum of the radii is lesser than the diameter of the second circle
         if type(other) == Circle:
-
-            return other.radius > self.radius and self.center.distance(other.center) + self.radius + other.radius < 2 * other.radius
+            return (
+                other.radius > self.radius
+                and self.center.distance(other.center) + self.radius + other.radius
+                < 2 * other.radius
+            )
 
         # for a circle to be inside a multi-polygon, it must be within the exterior polygon and not intersecting with the holes
         if type(other) == MultiPolygon:
-
             if self.within(other.geoms[0]):
-
                 for geom in other.geoms:
-
                     for hole in geom.interiors:
-
                         if self.intersects(hole):
-
                             return False
 
                 return True
@@ -85,15 +77,16 @@ class Circle(BaseGeometry):
             other = other.polygon
 
         # a circle is inside another shape if the center of the circle is contained in the shape and the minimum distance to the boundary is greater than the radius
-        return other.contains(self.center) and other.exterior.distance(self.center) > self.radius
+        return (
+            other.contains(self.center)
+            and other.exterior.distance(self.center) > self.radius
+        )
 
     def contains(self, other):
-
         """Returns True if the geometry contains the other, else False"""
 
         # for the circle-in-circle case, use the within implementation, in opposite order
         if type(other) == Circle:
-
             return other.within(self)
 
         # for multi-polygons, just it is just needed to check if the circle contains the boundary polygon
@@ -112,7 +105,6 @@ class Circle(BaseGeometry):
 
     @property
     def area(self):
-
         """Unitless area of the geometry (float)"""
 
         return np.pi * self.radius * self.radius
@@ -136,5 +128,5 @@ class Circle(BaseGeometry):
     def __geo_interface__(self):
         return None
 
-    def svg(self, scale_factor=1., **kwargs):
+    def svg(self, scale_factor=1.0, **kwargs):
         return None

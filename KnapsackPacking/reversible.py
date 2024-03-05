@@ -27,7 +27,6 @@ PLACEMENT_MODIFICATION_PROBABILITY = 0.05
 
 
 def select_item(items_by_weight):
-
     # perform a random choice of the next item to try to place
     list_index = random.randint(0, len(items_by_weight) - 1)
     item_index = items_by_weight[list_index][0]
@@ -35,8 +34,18 @@ def select_item(items_by_weight):
     return list_index, item_index
 
 
-def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_adding=MAX_ITER_NUM_WITHOUT_ADDITIONS, iter_num_to_revert_removal=ITER_NUM_TO_REVERT_REMOVAL, remove_prob=ITEM_REMOVAL_PROBABILITY, consec_remove_prob=CONSECUTIVE_ITEM_REMOVAL_PROBABILITY, ignore_removed_item_prob=IGNORE_REMOVED_ITEM_PROBABILITY, modify_prob=PLACEMENT_MODIFICATION_PROBABILITY, calculate_times=False, return_value_evolution=False):
-
+def solve_problem(
+    problem,
+    max_iter_num=MAX_ITER_NUM,
+    max_iter_num_without_adding=MAX_ITER_NUM_WITHOUT_ADDITIONS,
+    iter_num_to_revert_removal=ITER_NUM_TO_REVERT_REMOVAL,
+    remove_prob=ITEM_REMOVAL_PROBABILITY,
+    consec_remove_prob=CONSECUTIVE_ITEM_REMOVAL_PROBABILITY,
+    ignore_removed_item_prob=IGNORE_REMOVED_ITEM_PROBABILITY,
+    modify_prob=PLACEMENT_MODIFICATION_PROBABILITY,
+    calculate_times=False,
+    return_value_evolution=False,
+):
     """Find and return a solution to the passed problem, using an reversible strategy"""
 
     # create an initial solution with no item placed in the container
@@ -69,7 +78,10 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
         start_time = time.time()
 
     # sort items by weight, to speed up their discarding (when they would cause the capacity to be exceeded)
-    items_by_weight = sorted(list(problem.items.items()), key=lambda index_item_tuple: index_item_tuple[1].weight)
+    items_by_weight = sorted(
+        list(problem.items.items()),
+        key=lambda index_item_tuple: index_item_tuple[1].weight,
+    )
 
     if calculate_times:
         sort_time += get_time_since(start_time)
@@ -82,7 +94,9 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
         start_time = time.time()
 
     # discard the items that would make the capacity of the container to be exceeded
-    items_by_weight = items_by_weight[:get_index_after_weight_limit(items_by_weight, problem.container.max_weight)]
+    items_by_weight = items_by_weight[
+        : get_index_after_weight_limit(items_by_weight, problem.container.max_weight)
+    ]
 
     ignored_item_index = -1
 
@@ -91,10 +105,8 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
 
     # placements can only be possible with capacity and valid items
     if problem.container.max_weight and items_by_weight:
-
         # try to add items to the container, for a maximum number of iterations
         for i in range(max_iter_num):
-
             if calculate_times:
                 start_time = time.time()
 
@@ -108,8 +120,11 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
                 start_time = time.time()
 
             # try to add the item in a random position and with a random rotation; if it is valid, remove the item from the pending list
-            if solution.add_item(item_index, (random.uniform(min_x, max_x), random.uniform(min_y, max_y)), random.uniform(0, 360)):
-
+            if solution.add_item(
+                item_index,
+                (random.uniform(min_x, max_x), random.uniform(min_y, max_y)),
+                random.uniform(0, 360),
+            ):
                 if calculate_times:
                     addition_time += get_time_since(start_time)
 
@@ -127,7 +142,9 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
                     start_time = time.time()
 
                 # discard the items that would make the capacity of the container to be exceeded
-                items_by_weight = items_by_weight[:get_index_after_weight_limit(items_by_weight, remaining_weight)]
+                items_by_weight = items_by_weight[
+                    : get_index_after_weight_limit(items_by_weight, remaining_weight)
+                ]
 
                 if calculate_times:
                     item_discarding_time += get_time_since(start_time)
@@ -140,7 +157,6 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
                 iter_count_since_addition = 0
 
             else:
-
                 if calculate_times:
                     addition_time += get_time_since(start_time)
 
@@ -155,11 +171,11 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
                 start_time = time.time()
 
             # if there are items in the container, try to remove an item with a certain probability (different if there was a recent removal)
-            if solution.weight > 0 and random.uniform(0., 1.) < (consec_remove_prob if solution_before_removal else remove_prob):
-
+            if solution.weight > 0 and random.uniform(0.0, 1.0) < (
+                consec_remove_prob if solution_before_removal else remove_prob
+            ):
                 # if there is no solution prior to a removal with pending re-examination
                 if not solution_before_removal:
-
                     # save the current solution before removing, just in case in needs to be restored later
                     solution_before_removal = copy.deepcopy(solution)
 
@@ -170,25 +186,37 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
                 removed_index = solution.remove_random_item()
 
                 # with a certain probability, only if not ignoring any item yet, ignore placing again the removed item until the operation gets reverted or permanently accepted
-                if ignored_item_index < 0 and items_by_weight and random.uniform(0., 1.) < ignore_removed_item_prob:
+                if (
+                    ignored_item_index < 0
+                    and items_by_weight
+                    and random.uniform(0.0, 1.0) < ignore_removed_item_prob
+                ):
                     ignored_item_index = removed_index
 
                 # otherwise, add the removed item to the weight-sorted list of pending-to-add items
                 else:
-                    items_by_weight.insert(get_index_after_weight_limit(items_by_weight, problem.items[removed_index].weight), (removed_index, problem.items[removed_index]))
+                    items_by_weight.insert(
+                        get_index_after_weight_limit(
+                            items_by_weight, problem.items[removed_index].weight
+                        ),
+                        (removed_index, problem.items[removed_index]),
+                    )
 
             # if there is a recent removal to be confirmed or discarded after some time
             if solution_before_removal:
-
                 # re-examine a removal after a certain number of iterations
                 if iter_count_since_removal == iter_num_to_revert_removal:
-
                     # if the value in the container has improved since removal, accept the operation in a definitive way
                     if solution.value > solution_before_removal.value:
-
                         # if an item had been ignored, make it available for placement again
                         if ignored_item_index >= 0:
-                            items_by_weight.insert(get_index_after_weight_limit(items_by_weight, problem.items[ignored_item_index].weight), (ignored_item_index, problem.items[ignored_item_index]))
+                            items_by_weight.insert(
+                                get_index_after_weight_limit(
+                                    items_by_weight,
+                                    problem.items[ignored_item_index].weight,
+                                ),
+                                (ignored_item_index, problem.items[ignored_item_index]),
+                            )
 
                     # otherwise, revert the solution to the pre-removal state
                     else:
@@ -213,14 +241,16 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
                 start_time = time.time()
 
             # if there are still items in the container (maybe there was a removal), modify existing placements with a certain probability
-            if solution.weight > 0 and random.uniform(0., 1.) < modify_prob:
-
+            if solution.weight > 0 and random.uniform(0.0, 1.0) < modify_prob:
                 # perform a random choice of the item to try to affect
                 _, item_index = select_item(items_by_weight)
 
                 # move to a random position of the container with a probability of 50%
-                if random.uniform(0., 1.) < 0.5:
-                    solution.move_item_to(item_index, (random.uniform(min_x, max_x), random.uniform(min_y, max_y)))
+                if random.uniform(0.0, 1.0) < 0.5:
+                    solution.move_item_to(
+                        item_index,
+                        (random.uniform(min_x, max_x), random.uniform(min_y, max_y)),
+                    )
 
                 # otherwise, perform a random rotation
                 else:
@@ -230,7 +260,6 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
                 modification_time += get_time_since(start_time)
 
             if return_value_evolution:
-
                 if calculate_times:
                     start_time = time.time()
 
@@ -244,7 +273,6 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
             solution = solution_before_removal
 
             if return_value_evolution:
-
                 if calculate_times:
                     start_time = time.time()
 
@@ -255,8 +283,42 @@ def solve_problem(problem, max_iter_num=MAX_ITER_NUM, max_iter_num_without_addin
 
     # encapsulate all times informatively in a dictionary
     if calculate_times:
-        approx_total_time = sort_time + item_selection_time + item_discarding_time + addition_time + removal_time + modification_time + value_evolution_time
-        time_dict = {"Weight-sort": (sort_time, sort_time / approx_total_time), "Stochastic item selection": (item_selection_time, item_selection_time / approx_total_time), "Item discarding": (item_discarding_time, item_discarding_time / approx_total_time), "Addition (with geometric validation)": (addition_time, addition_time / approx_total_time), "Removal and reverting-removal": (removal_time, removal_time / approx_total_time), "Placement modification (with geometric validation)": (modification_time, modification_time / approx_total_time), "Keeping value of each iteration": (value_evolution_time, value_evolution_time / approx_total_time)}
+        approx_total_time = (
+            sort_time
+            + item_selection_time
+            + item_discarding_time
+            + addition_time
+            + removal_time
+            + modification_time
+            + value_evolution_time
+        )
+        time_dict = {
+            "Weight-sort": (sort_time, sort_time / approx_total_time),
+            "Stochastic item selection": (
+                item_selection_time,
+                item_selection_time / approx_total_time,
+            ),
+            "Item discarding": (
+                item_discarding_time,
+                item_discarding_time / approx_total_time,
+            ),
+            "Addition (with geometric validation)": (
+                addition_time,
+                addition_time / approx_total_time,
+            ),
+            "Removal and reverting-removal": (
+                removal_time,
+                removal_time / approx_total_time,
+            ),
+            "Placement modification (with geometric validation)": (
+                modification_time,
+                modification_time / approx_total_time,
+            ),
+            "Keeping value of each iteration": (
+                value_evolution_time,
+                value_evolution_time / approx_total_time,
+            ),
+        }
         if return_value_evolution:
             return solution, time_dict, value_evolution
         return solution, time_dict

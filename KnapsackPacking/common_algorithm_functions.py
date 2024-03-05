@@ -14,7 +14,6 @@ PLOT_DPI = 200
 
 
 def print_if_allowed(string, can_print):
-
     """Print if allowed to do so"""
 
     if can_print:
@@ -22,7 +21,6 @@ def print_if_allowed(string, can_print):
 
 
 def add_newlines_by_spaces(string, line_length):
-
     """Return a version of the passed string where spaces (or hyphens) get replaced with a new line if the accumulated number of characters has exceeded the specified line length"""
 
     replacement_indices = set()
@@ -34,18 +32,18 @@ def add_newlines_by_spaces(string, line_length):
             replacement_indices.add(i)
             current_length = 0
 
-    return "".join([("\n" if i in replacement_indices else char) for i, char in enumerate(string)])
+    return "".join(
+        [("\n" if i in replacement_indices else char) for i, char in enumerate(string)]
+    )
 
 
 def get_time_since(start_time):
-
     """Return the time elapsed since the passed start time, in milliseconds"""
 
-    return (time.time() - start_time) * 1000.
+    return (time.time() - start_time) * 1000.0
 
 
 def get_index_after_weight_limit(items_by_weight, weight_limit):
-
     """Given a list of (item_index, [any other fields,] item) tuples sorted by item weight, find the positional index that first exceeds the passed weight limit"""
 
     # find the item that first exceeds the weight limit; binary search code is based on bisect.bisect_right from standard Python library, but adapted to weight check
@@ -61,7 +59,6 @@ def get_index_after_weight_limit(items_by_weight, weight_limit):
 
 
 def visualize_plot(values, title, labels=None, show_plot=True, save_path=None):
-
     """Given a list of sequential values, show a line-based visualization (and/or save it to a file, as indicated in the parameters)"""
 
     fig, ax = plt.subplots(figsize=PLOT_FIG_SIZE)
@@ -82,8 +79,14 @@ def visualize_plot(values, title, labels=None, show_plot=True, save_path=None):
         plt.close(fig)
 
 
-def visualize_boxplot_for_data_sequence(data_lists, title, labels=None, y_scale_override=None, show_plot=True, save_path=None):
-
+def visualize_boxplot_for_data_sequence(
+    data_lists,
+    title,
+    labels=None,
+    y_scale_override=None,
+    show_plot=True,
+    save_path=None,
+):
     """Given a list of lists (assumed to collectively define a sequence), a boxplot is shown (and/or save it to a file) for the data values of each sublist"""
 
     fig, ax = plt.subplots(figsize=PLOT_FIG_SIZE)
@@ -92,11 +95,27 @@ def visualize_boxplot_for_data_sequence(data_lists, title, labels=None, y_scale_
     if not labels:
         labels = range(len(data_lists))
 
-    ax.boxplot(data_lists, labels=labels, showmeans=True, meanline=True, whis=[5, 95], flierprops=dict(markerfacecolor='black', marker='+'))
+    ax.boxplot(
+        data_lists,
+        labels=labels,
+        showmeans=True,
+        meanline=True,
+        whis=[5, 95],
+        flierprops=dict(markerfacecolor="black", marker="+"),
+    )
 
     # based on: https://matplotlib.org/3.1.1/gallery/text_labels_and_annotations/custom_legends.html
-    legend_lines = [Line2D([0], [0], color="orange", lw=1, ls="-"), Line2D([0], [0], color="g", lw=1, ls="--")]
-    ax.legend(legend_lines, ["median", "mean"], loc="upper left", fontsize="large", framealpha=0.6)
+    legend_lines = [
+        Line2D([0], [0], color="orange", lw=1, ls="-"),
+        Line2D([0], [0], color="g", lw=1, ls="--"),
+    ]
+    ax.legend(
+        legend_lines,
+        ["median", "mean"],
+        loc="upper left",
+        fontsize="large",
+        framealpha=0.6,
+    )
 
     if y_scale_override:
         ax.set_yscale(y_scale_override)
@@ -116,7 +135,6 @@ def visualize_boxplot_for_data_sequence(data_lists, title, labels=None, y_scale_
 
 
 def visualize_bar_plot(values, labels, title, show_plot=True, save_path=None):
-
     """Represent the passed values in a bar plot, showing it and/or saving it to a file"""
 
     fig, ax = plt.subplots(figsize=PLOT_FIG_SIZE)
@@ -138,7 +156,15 @@ def visualize_bar_plot(values, labels, title, show_plot=True, save_path=None):
 
 
 def get_stats(values, round_decimal_num):
-
     """Return (decimal-rounded) statistics from the passed values: mean, standard deviation, maximum, median and minimum"""
 
-    return (round(stat, round_decimal_num) for stat in (np.mean(values), np.std(values), np.min(values), np.median(values), np.max(values)))
+    return (
+        round(stat, round_decimal_num)
+        for stat in (
+            np.mean(values),
+            np.std(values),
+            np.min(values),
+            np.median(values),
+            np.max(values),
+        )
+    )
