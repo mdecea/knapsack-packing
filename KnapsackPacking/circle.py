@@ -1,5 +1,4 @@
 import numpy as np
-from shapely.geometry.base import BaseGeometry
 from shapely.geometry import Point, MultiPolygon
 from ellipse import Ellipse
 
@@ -10,7 +9,7 @@ VISUALIZATION_RESOLUTION = 32
 INTERSECTION_POINT_RESOLUTION = 6
 
 
-class Circle(BaseGeometry):
+class Circle:
     def __init__(self, center, radius):
         """Constructor"""
 
@@ -19,13 +18,18 @@ class Circle(BaseGeometry):
             self.center = Point(center[0], center[1])
         self.radius = radius
 
-        # approximate polygon used only when specific intersection points with other shapes need to be found, while the real circle formulae are used for most calculus (including intersection/contains/within checks)
+        # approximate polygon used only when specific intersection points with other shapes need
+        # to be found, while the real circle formulae are used for most calculus (including
+        # intersection/contains/within checks)
         self.polygon = self.center.buffer(
             self.radius, resolution=INTERSECTION_POINT_RESOLUTION
         )
 
     def __reduce__(self):
         return Circle, (self.center, self.radius)
+
+    def is_empty(self):
+        return False
 
     def intersects(self, other):
         """Returns True if geometries intersect, else False"""
@@ -130,3 +134,8 @@ class Circle(BaseGeometry):
 
     def svg(self, scale_factor=1.0, **kwargs):
         return None
+
+
+if __name__ == "__main__":
+    shape = Circle((13, 13), 13)
+    print(type(shape))

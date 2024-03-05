@@ -620,7 +620,7 @@ def create_packing_problems_with_optimal_solution_values():
     # the capacity is set to infinite so that it never restricts placements; all items have value 1 so that the objective is to maximize the number of placed items
     max_weight = np.inf
 
-    # # Circles in circle; Wolfram Alpha query: "pack 7 circles of radius 3.9 in a circle of radius 13"; full link: https://www.wolframalpha.com/input/?i=pack+7+circles+of+radius+3.9+in+a+circle+of+radius+13
+    # Circles in circle; Wolfram Alpha query: "pack 7 circles of radius 3.9 in a circle of radius 13"; full link: https://www.wolframalpha.com/input/?i=pack+7+circles+of+radius+3.9+in+a+circle+of+radius+13
     # container_shape = Circle((13, 13), 13)
     # container = Container(max_weight, container_shape)
     # item_num = 7

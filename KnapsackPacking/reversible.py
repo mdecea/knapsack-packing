@@ -45,8 +45,12 @@ def solve_problem(
     modify_prob=PLACEMENT_MODIFICATION_PROBABILITY,
     calculate_times=False,
     return_value_evolution=False,
+    rotation="none",
 ):
-    """Find and return a solution to the passed problem, using an reversible strategy"""
+    """Find and return a solution to the passed problem, using an reversible strategy.
+
+    rotation: either "none" (no rotation allowed), "free" (any rotation allowed)
+        or "manhattan" (0, 90, 180, 270 allowed)"""
 
     # create an initial solution with no item placed in the container
     solution = Solution(problem)
@@ -120,10 +124,16 @@ def solve_problem(
                 start_time = time.time()
 
             # try to add the item in a random position and with a random rotation; if it is valid, remove the item from the pending list
+            if rotation == "none":
+                rot = 0
+            elif rotation == "free":
+                rot = random.uniform(0, 360)
+            elif rotation == "manhattan":
+                rot = random.choice([0, 90, 180, 270])
             if solution.add_item(
                 item_index,
                 (random.uniform(min_x, max_x), random.uniform(min_y, max_y)),
-                random.uniform(0, 360),
+                rot,
             ):
                 if calculate_times:
                     addition_time += get_time_since(start_time)
@@ -254,7 +264,13 @@ def solve_problem(
 
                 # otherwise, perform a random rotation
                 else:
-                    solution.rotate_item_to(item_index, random.uniform(0, 360))
+                    if rotation == "none":
+                        rot = 0
+                    elif rotation == "free":
+                        rot = random.uniform(0, 360)
+                    elif rotation == "manhattan":
+                        rot = random.choice([0, 90, 180, 270])
+                    solution.rotate_item_to(item_index, rot)
 
             if calculate_times:
                 modification_time += get_time_since(start_time)
