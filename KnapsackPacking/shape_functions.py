@@ -141,7 +141,7 @@ def get_intersection_points_between_shapes(shape0, shape1):
             intersection_points.append((intersection_result.x, intersection_result.y))
 
         elif type(intersection_result) == MultiPoint:
-            for point in intersection_result:
+            for point in intersection_result.geoms:
                 intersection_points.append((point.x, point.y))
 
     return intersection_points
