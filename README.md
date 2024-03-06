@@ -2,7 +2,14 @@
 
 ## Introduction
 
-This project contains the code to solve a combination of the Packing Problem and the Knapsack Problem in 2D: different items with value, weight and shape can be placed in a container (of a certain shape), and the goal is to maximize the value of items placed in the container, without geometric intersections nor exceeding a maximum weight limit (capacity) of the container.  Check the report for a more detailed explanation of the problem, the developed algorithms (present in the "KnapsackPacking") and the performed experiments (whose results, including many plots, can be found in the "Output" folder).
+This is a modified version of the Knapsack-packing repo written by Albert Espin on the context of his Masters thesis (https://github.com/albert-espin/knapsack-packing).
+
+Most of the functions are taken from his version as-is. Main modifications that I implemented:
+- Make it work with shapely v2.0.
+- Restricting possible rotations of the elements to pack.
+- Code formatting.
+
+This project contains the code to solve a combination of the Packing Problem and the Knapsack Problem in 2D: different items with value, weight and shape can be placed in a container (of a certain shape), and the goal is to maximize the value of items placed in the container, without geometric intersections nor exceeding a maximum weight limit (capacity) of the container.
 
 ## Performing experiments
 
@@ -77,8 +84,3 @@ The solutions obtained by the evolutionary algorithm for some of the tested prob
 ![Problem 7](https://raw.githubusercontent.com/albert-espin/knapsack-packing/master/Output/Problems/CustomKnapsackPacking/Comparison/7/evolutionary_exec5_solution.png)
 
 ![Problem 8](https://raw.githubusercontent.com/albert-espin/knapsack-packing/master/Output/Problems/CustomKnapsackPacking/Comparison/8/evolutionary_exec5_solution.png)
-
-
-## Research context
-
-This work was submitted as Master Thesis for Master in Artificial Intelligence of Universitat Politècnica de Catalunya (UPC), in January 2020. The official publication in the repository of the University can be found [here](https://upcommons.upc.edu/handle/2117/178858).

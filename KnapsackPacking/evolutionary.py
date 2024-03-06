@@ -667,6 +667,7 @@ def mutate_with_placement_modification(
     rotate_until_intersection_angle_num,
     item_index=-1,
     action_index=-1,
+    rotation="none",
 ):
     """Try to mutate the passed solution in-place by modifying an existing placement"""
 
@@ -727,20 +728,30 @@ def mutate_with_placement_modification(
                 action_indices.append(position_swap_index)
 
             # only some items can be rotated
-            if not np.isnan(solution.placed_items[item_index].rotation):
-                action_indices.extend(
-                    [
-                        rotation_change_index,
-                        small_rotation_change_index,
-                        rotate_until_intersect_index,
-                        position_rotation_change_index,
-                        small_position_rotation_change_index,
-                    ]
-                )
-                if can_swap:
+            if rotation != "none":
+                if rotation == "free" and not np.isnan(
+                    solution.placed_items[item_index].rotation
+                ):
                     action_indices.extend(
-                        [rotation_swap_index, position_rotation_swap_index]
+                        [
+                            rotation_change_index,
+                            small_rotation_change_index,
+                            rotate_until_intersect_index,
+                            position_rotation_change_index,
+                            small_position_rotation_change_index,
+                        ]
                     )
+                elif rotation == "manhattan":
+                    action_indices.extend(
+                        [
+                            rotation_change_index,
+                            position_rotation_change_index,
+                        ]
+                    )
+            if can_swap:
+                action_indices.extend(
+                    [rotation_swap_index, position_rotation_swap_index]
+                )
 
             # select a modification action, with the same probability for all of the available ones
             action_index = random.choice(action_indices)
@@ -785,9 +796,14 @@ def mutate_with_placement_modification(
                 )
                 swap_ignore_indices.append(swap_item_index)
             elif action_index == rotation_change_index:
-                has_modified = solution.rotate_item_to(
-                    item_index, random.uniform(0, 360)
-                )
+                if rotation == "free":
+                    has_modified = solution.rotate_item_to(
+                        item_index, random.uniform(0, 360)
+                    )
+                elif rotation == "manhattan":
+                    has_modified = solution.rotate_item_to(
+                        item_index, random.choice([0, 90, 180, 270])
+                    )
             elif action_index == small_rotation_change_index:
                 has_modified = solution.rotate_item(
                     item_index, random.uniform(-max_small_rotation, max_small_rotation)
@@ -812,10 +828,14 @@ def mutate_with_placement_modification(
                 )
                 swap_ignore_indices.append(swap_item_index)
             elif action_index == position_rotation_change_index:
+                if rotation == "free":
+                    rot = random.uniform(0, 360)
+                elif rotation == "manhattan":
+                    rot = random.choice([0, 90, 180, 270])
                 has_modified = solution.move_and_rotate_item_to(
                     item_index,
                     (random.uniform(min_x, max_x), random.uniform(min_y, max_y)),
-                    random.uniform(0, 360),
+                    rot,
                 )
             elif action_index == small_position_rotation_change_index:
                 has_modified = solution.move_and_rotate_item(
@@ -862,6 +882,7 @@ def get_mutation(
     mutation_modify_move_until_intersection_min_dist_proportion,
     mutation_modify_rotate_until_intersection_angle_num,
     mutation_intermediate_selection_prob,
+    rotation,
 ):
     """Generate and return a mutated copy of the passed solution"""
 
@@ -913,6 +934,7 @@ def get_mutation(
                 mutation_modify_move_until_intersection_point_num,
                 mutation_modify_move_until_intersection_min_dist_proportion,
                 mutation_modify_rotate_until_intersection_angle_num,
+                rotation=rotation,
             )
 
         # if a mutation was applied and there is any possibility to select intermediate solutions as final ones and the current intermediate solution is better than any previous one, keep a copy of it
@@ -961,6 +983,7 @@ def generate_offspring(
     crossover_max_permutation_num,
     crossover_min_fitness_for_non_best,
     calculate_times=False,
+    rotation="none",
 ):
     """Generate and return offspring from the passed parents"""
 
@@ -1030,6 +1053,7 @@ def generate_offspring(
                 mutation_modify_move_until_intersection_min_dist_proportion,
                 mutation_modify_rotate_until_intersection_angle_num,
                 mutation_intermediate_selection_prob,
+                rotation,
             )
 
             # if crossover was used and the mutated individual is less fit (or same but loses the tie-break), keep the pre-mutation individual with a certain probability
@@ -1142,8 +1166,12 @@ def solve_problem(
     crossover_min_fitness_for_non_best_proportion=CROSSOVER_MIN_FITNESS_FOR_NON_BEST_PROPORTION,
     calculate_times=False,
     return_population_fitness_per_generation=False,
+    rotation="none",
 ):
-    """Find and return a solution to the passed problem, using an evolutionary algorithm"""
+    """Find and return a solution to the passed problem, using an evolutionary algorithm
+
+    rotation: either "none" (no rotation allowed), "free" (any rotation allowed)
+        or "manhattan" (0, 90, 180, 270 allowed)"""
 
     start_time = (
         initial_population_time
@@ -1259,6 +1287,7 @@ def solve_problem(
             crossover_max_permutation_num,
             crossover_min_fitness_for_non_best,
             calculate_times,
+            rotation,
         )
         if calculate_times:
             offspring, new_crossover_time, new_mutation_time = offspring_result
