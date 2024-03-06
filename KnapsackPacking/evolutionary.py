@@ -254,6 +254,7 @@ def generate_initial_solution(
     item_index_to_place_first=-1,
     item_specialization_iter_proportion=0.0,
     calculate_times=False,
+    rotation="none",
 ):
     """Generate an initial solution for the passed problem trying to place randomly selected items until some termination criteria is met"""
 
@@ -267,10 +268,13 @@ def generate_initial_solution(
         item_index_to_place_first=item_index_to_place_first,
         item_specialization_iter_proportion=item_specialization_iter_proportion,
         calculate_times=calculate_times,
+        rotation=rotation,
     )
 
 
-def generate_population(problem, population_size, item_specialization_iter_proportion):
+def generate_population(
+    problem, population_size, item_specialization_iter_proportion, rotation
+):
     """Generate a population of the passed size for the passed problem"""
 
     # find the items whose weight does not exceed the container's capacity
@@ -295,7 +299,10 @@ def generate_population(problem, population_size, item_specialization_iter_propo
         population.extend(
             [
                 generate_initial_solution(
-                    problem, item_index, item_specialization_iter_proportion
+                    problem,
+                    item_index,
+                    item_specialization_iter_proportion,
+                    rotation=rotation,
                 )
                 for _ in range(solution_num_per_item_specialization)
             ]
@@ -304,7 +311,10 @@ def generate_population(problem, population_size, item_specialization_iter_propo
     # create as many solutions with standard initialization as needed to reach the wanted population size
     remaining_solution_num = population_size - len(population)
     population.extend(
-        [generate_initial_solution(problem) for _ in range(remaining_solution_num)]
+        [
+            generate_initial_solution(problem, rotation=rotation)
+            for _ in range(remaining_solution_num)
+        ]
     )
 
     return population
@@ -608,7 +618,7 @@ def get_crossover(
     return offspring0, offspring1
 
 
-def mutate_with_addition(solution, max_attempt_num):
+def mutate_with_addition(solution, max_attempt_num, rotation="none"):
     """Try to mutate the passed solution in-place by adding an item"""
 
     # find the weight than can still be added to the container
@@ -633,10 +643,17 @@ def mutate_with_addition(solution, max_attempt_num):
         # perform up to a maximum number of attempts
         for _ in range(max_attempt_num):
             # if the action succeeds, there is nothing more to try
+            if rotation == "none":
+                rot = 0
+            elif rotation == "free":
+                rot = random.uniform(0, 360)
+            elif rotation == "manhattan":
+                rot = random.choice([0, 90, 180, 270])
+
             if solution.add_item(
                 item_index,
                 (random.uniform(min_x, max_x), random.uniform(min_y, max_y)),
-                random.uniform(0, 360),
+                rot,
             ):
                 return True
 
@@ -915,7 +932,9 @@ def get_mutation(
         # mutate with the selected action type
         if action_index == add_index:
             has_mutated = mutate_with_addition(
-                mutated_solution, mutation_add_max_attempt_num
+                mutated_solution,
+                mutation_add_max_attempt_num,
+                rotation=rotation,
             )
             # if the addition is successful, it can compensate a previous removal; also count as compensated any failed additions after the base iteration limit, to avoid an eventual infinite loop
             if has_mutated or iter_count >= min_iter_num:
@@ -1197,7 +1216,10 @@ def solve_problem(
 
     # generate the initial population
     population = generate_population(
-        problem, population_size, initial_generation_item_specialization_iter_proportion
+        problem,
+        population_size,
+        initial_generation_item_specialization_iter_proportion,
+        rotation,
     )
 
     if calculate_times:
