@@ -6,9 +6,9 @@ import time
 import numpy as np
 import greedy
 from circle import Circle
-from common_algorithm_functions import get_time_since
-from ellipse import Ellipse
-from shape_functions import (
+from KnapsackPacking.common_algorithm_functions import get_time_since
+from KnapsackPacking.ellipse import Ellipse
+from KnapsackPacking.shape_functions import (
     get_bounds,
     create_random_polygon,
     do_shapes_intersect,

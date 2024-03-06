@@ -1,0 +1,18 @@
+[build-system]
+build-backend = "setuptools.build_meta"
+requires = ["setuptools>=61.0"]
+
+[project]
+authors = [
+  {name = "Marc de Cea", email = "mdecea@google.com"}
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent"
+]
+description = "Package to solve combined Knapsack and Packing problem"
+name = "KnapsackPacking"
+readme = "README.md"
+requires-python = ">=3.8"
+version = "0.0.1"

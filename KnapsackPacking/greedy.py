@@ -2,8 +2,11 @@ import copy
 import itertools
 import random
 import time
-from problem_solution import Solution, get_bounds
-from common_algorithm_functions import get_index_after_weight_limit, get_time_since
+from KnapsackPacking.problem_solution import Solution, get_bounds
+from KnapsackPacking.common_algorithm_functions import (
+    get_index_after_weight_limit,
+    get_time_since,
+)
 
 # default weight of the value of an item in the weighted sum of the value and the profitability ratio, that has a weight of 1-VALUE_WEIGHT
 VALUE_WEIGHT = 0.5

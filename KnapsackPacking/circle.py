@@ -1,6 +1,6 @@
 import numpy as np
 from shapely.geometry import Point, MultiPolygon
-from ellipse import Ellipse
+from KnapsackPacking.ellipse import Ellipse
 
 # resolution of the polygon approximating a circle used only for visualization; according to Shapely documentation, a resolution of 16 allows to cover 99.8% of the circle's area (https://shapely.readthedocs.io/en/stable/manual.html#object.buffer)
 VISUALIZATION_RESOLUTION = 32

@@ -6,12 +6,12 @@ from math import ceil
 from multiprocessing import Pool
 import pandas as pd
 from shapely.geometry import Polygon, MultiPolygon, Point
-import evolutionary
-import greedy
-import reversible
-import shape_functions
-from circle import Circle
-from common_algorithm_functions import (
+import KnapsackPacking.evolutionary as evolutionary
+import KnapsackPacking.greedy as greedy
+import KnapsackPacking.reversible as reversible
+import KnapsackPacking.shape_functions as shape_functions
+from KnapsackPacking.circle import Circle
+from KnapsackPacking.common_algorithm_functions import (
     get_time_since,
     visualize_boxplot_for_data_sequence,
     print_if_allowed,
@@ -20,8 +20,8 @@ from common_algorithm_functions import (
     add_newlines_by_spaces,
     get_stats,
 )
-from ellipse import Ellipse
-from problem_solution import Item, Container, Problem, Solution
+from KnapsackPacking.ellipse import Ellipse
+from KnapsackPacking.problem_solution import Item, Container, Problem, Solution
 
 # types of problems that can be solved: Knapsack-Packing Joint Problem, or Packing Problem
 KNAPSACK_PACKING_PROBLEM_TYPE = "KnapsackPacking"
@@ -31,7 +31,7 @@ PACKING_PROBLEM_TYPE = "Packing"
 KNAPSACK_PACKING_PROBLEM_DIR = "../Output/Problems/CustomKnapsackPacking/Comparison/"
 
 # directory where to save figures and results of instances of the Packing Problem
-PACKING_PROBLEM_DIR = "../Output/Problems/Packing/Comparison/"
+PACKING_PROBLEM_DIR = "./Output/"
 
 
 def create_knapsack_packing_problems_with_manual_solutions(can_print=False):
@@ -943,7 +943,7 @@ def perform_experiments(problem_type, output_dir, load_experiments):
 
     if experiment_dict:
         # experiment-saving parameter
-        save_experiments = True
+        save_experiments = False
 
         # if possible, save the experiments to a binary file
         if not load_experiments and save_experiments:
