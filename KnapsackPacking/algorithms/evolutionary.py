@@ -4,11 +4,11 @@ import math
 import random
 import time
 import numpy as np
-import greedy
-from circle import Circle
-from KnapsackPacking.common_algorithm_functions import get_time_since
-from KnapsackPacking.ellipse import Ellipse
-from KnapsackPacking.shape_functions import (
+import KnapsackPacking.algorithms.greedy as greedy
+from KnapsackPacking.shapes.circle import Circle
+from KnapsackPacking.algorithms.common_algorithm_functions import get_time_since
+from KnapsackPacking.shapes.ellipse import Ellipse
+from KnapsackPacking.shapes.shape_functions import (
     get_bounds,
     create_random_polygon,
     do_shapes_intersect,

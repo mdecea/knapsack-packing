@@ -2,16 +2,14 @@ import os
 import pickle
 import time
 import numpy as np
-from math import ceil
-from multiprocessing import Pool
 import pandas as pd
 from shapely.geometry import Polygon, MultiPolygon, Point
-import KnapsackPacking.evolutionary as evolutionary
-import KnapsackPacking.greedy as greedy
-import KnapsackPacking.reversible as reversible
-import KnapsackPacking.shape_functions as shape_functions
-from KnapsackPacking.circle import Circle
-from KnapsackPacking.common_algorithm_functions import (
+import KnapsackPacking.algorithms.evolutionary as evolutionary
+import KnapsackPacking.algorithms.greedy as greedy
+import KnapsackPacking.algorithms.reversible as reversible
+import KnapsackPacking.shapes.shape_functions as shape_functions
+from KnapsackPacking.shapes.circle import Circle
+from KnapsackPacking.algorithms.common_algorithm_functions import (
     get_time_since,
     visualize_boxplot_for_data_sequence,
     print_if_allowed,
@@ -20,8 +18,14 @@ from KnapsackPacking.common_algorithm_functions import (
     add_newlines_by_spaces,
     get_stats,
 )
-from KnapsackPacking.ellipse import Ellipse
-from KnapsackPacking.problem_solution import Item, Container, Problem, Solution
+from KnapsackPacking.shapes.ellipse import Ellipse
+from KnapsackPacking.algorithms.problem_solution import (
+    Item,
+    Container,
+    Problem,
+    Solution,
+)
+from KnapsackPacking.solve_problem import execute_algorithm
 
 # types of problems that can be solved: Knapsack-Packing Joint Problem, or Packing Problem
 KNAPSACK_PACKING_PROBLEM_TYPE = "KnapsackPacking"
@@ -725,148 +729,6 @@ def create_problems(problem_type, can_print=False):
     return None, None, None
 
 
-def execute_algorithm_with_params(params):
-    """Execute the algorithm specified in the first of the passed parameters with the rest of parameters, and return the solution, value and elapsed time"""
-
-    # unpack the algorithm and its parameters
-    (
-        algorithm,
-        algorithm_name,
-        problem,
-        show_solution_plot,
-        solution_plot_save_path,
-        calculate_times,
-        calculate_value_evolution,
-    ) = params
-
-    start_time = time.time()
-    value_evolution = None
-    times_dict = None
-    if calculate_value_evolution:
-        if algorithm == evolutionary.solve_problem:
-            if calculate_times:
-                solution, times_dict, value_evolution = algorithm(
-                    problem,
-                    calculate_times=calculate_times,
-                    return_population_fitness_per_generation=calculate_value_evolution,
-                )
-            else:
-                solution, value_evolution = algorithm(
-                    problem,
-                    calculate_times=calculate_times,
-                    return_population_fitness_per_generation=calculate_value_evolution,
-                )
-        else:
-            if calculate_times:
-                solution, times_dict, value_evolution = algorithm(
-                    problem,
-                    calculate_times=calculate_times,
-                    return_value_evolution=calculate_value_evolution,
-                )
-            else:
-                solution, value_evolution = algorithm(
-                    problem,
-                    calculate_times=calculate_times,
-                    return_value_evolution=calculate_value_evolution,
-                )
-    elif calculate_times:
-        solution, times_dict = algorithm(problem, calculate_times=calculate_times)
-    else:
-        solution = algorithm(problem)
-    elapsed_time = get_time_since(start_time)
-
-    if solution and (show_solution_plot or solution_plot_save_path):
-        solution.visualize(
-            show_plot=show_solution_plot, save_path=solution_plot_save_path
-        )
-
-    return solution, solution.value, value_evolution, elapsed_time, times_dict
-
-
-def execute_algorithm(
-    algorithm,
-    algorithm_name,
-    problem,
-    show_solution_plot=False,
-    solution_plot_save_path=None,
-    calculate_times=False,
-    calculate_fitness_stats=False,
-    execution_num=1,
-    process_num=1,
-):
-    """Execute the passed algorithm as many times as specified (with each execution in a different CPU process if indicated), returning (at least) lists with the obtained solutions, values and elapsed times (one per execution)"""
-
-    # encapsulate the algorithm and its parameters in a tuple for each execution (needed for multi-processing)
-    param_tuples = [
-        (
-            algorithm,
-            algorithm_name,
-            problem,
-            show_solution_plot,
-            solution_plot_save_path,
-            calculate_times,
-            calculate_fitness_stats,
-        )
-        for _ in range(execution_num)
-    ]
-
-    solutions, values, value_evolutions, times, time_divisions = (
-        list(),
-        list(),
-        list(),
-        list(),
-        list(),
-    )
-
-    # if possible, perform each execution in a separate CPU process (in parallel)
-    if process_num > 1:
-        process_pool = Pool(process_num)
-        batch_num = ceil(execution_num / process_num)
-        for batch in range(batch_num):
-            results = process_pool.map(
-                execute_algorithm_with_params,
-                param_tuples[batch * process_num : batch * process_num + process_num],
-            )
-            (
-                batch_solutions,
-                batch_values,
-                batch_value_evolutions,
-                batch_times,
-                batch_time_divisions,
-            ) = (
-                [result[0] for result in results],
-                [result[1] for result in results],
-                [result[2] for result in results],
-                [result[3] for result in results],
-                [result[4] for result in results],
-            )
-            solutions.extend(batch_solutions)
-            values.extend(batch_values)
-            value_evolutions.extend(batch_value_evolutions)
-            times.extend(batch_times)
-            time_divisions.extend(batch_time_divisions)
-            """process_pool.terminate()
-            process_pool.join()"""
-
-    # perform the calculation sequentially if multi-processing is not allowed
-    else:
-        for i in range(execution_num):
-            (
-                solution,
-                value,
-                value_evolution,
-                elapsed_time,
-                time_division,
-            ) = execute_algorithm_with_params(param_tuples[i])
-            solutions.append(solution)
-            values.append(value)
-            value_evolutions.append(value_evolution)
-            times.append(elapsed_time)
-            time_divisions.append(time_division)
-
-    return solutions, values, value_evolutions, times, time_divisions
-
-
 def perform_experiments(problem_type, output_dir, load_experiments):
     """Perform a set of experiments for the problem with the passed index, and producing output in the specified directory (when applicable)"""
 
@@ -997,19 +859,19 @@ def visualize_and_save_experiments(
     output_dir,
     can_plots_show_value_and_weight=True,
     show_problem_stats=False,
-    save_problem_stats=True,
+    save_problem_stats=False,
     show_manual_solution_plots=False,
-    save_manual_solution_plots=True,
+    save_manual_solution_plots=False,
     show_algorithm_solution_plots=False,
-    save_algorithm_solution_plots=True,
+    save_algorithm_solution_plots=False,
     show_value_evolution_plots=False,
-    save_value_evolution_plots=True,
+    save_value_evolution_plots=False,
     show_time_division_plots=False,
-    save_time_division_plots=True,
+    save_time_division_plots=False,
     show_algorithm_comparison=False,
-    save_algorithm_comparison=True,
-    show_aggregated_result_tables=True,
-    save_aggregated_result_tables=True,
+    save_algorithm_comparison=False,
+    show_aggregated_result_tables=False,
+    save_aggregated_result_tables=False,
 ):
     """Show and/or save different plots of the results of the experiments represented in the passed dictionary, as specified by the parameters"""
 

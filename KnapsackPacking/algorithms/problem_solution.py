@@ -11,7 +11,7 @@ from shapely.geometry import (
     Polygon,
     LineString,
 )
-from KnapsackPacking.shape_functions import (
+from KnapsackPacking.shapes.shape_functions import (
     copy_shape,
     get_bounding_rectangle_center,
     copy,

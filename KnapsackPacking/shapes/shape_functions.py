@@ -10,8 +10,8 @@ from shapely.geometry import (
     MultiPoint,
     MultiLineString,
 )
-from KnapsackPacking.circle import Circle, VISUALIZATION_RESOLUTION
-from KnapsackPacking.ellipse import Ellipse
+from KnapsackPacking.shapes.circle import Circle, VISUALIZATION_RESOLUTION
+from KnapsackPacking.shapes.ellipse import Ellipse
 
 
 def get_bounds(shape):

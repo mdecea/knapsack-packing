@@ -1,8 +1,8 @@
 import copy
 import random
 import time
-from KnapsackPacking.problem_solution import Solution, get_bounds
-from KnapsackPacking.common_algorithm_functions import (
+from KnapsackPacking.algorithms.problem_solution import Solution, get_bounds
+from KnapsackPacking.algorithms.common_algorithm_functions import (
     get_index_after_weight_limit,
     get_time_since,
 )
