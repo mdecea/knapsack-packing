@@ -93,8 +93,13 @@ def execute_algorithm(
     execution_num=1,
     process_num=1,
     rotation="none",
+    stop_if_successful=True,
+    optimal_value=None,
 ):
-    """Execute the passed algorithm as many times as specified (with each execution in a different CPU process if indicated), returning (at least) lists with the obtained solutions, values and elapsed times (one per execution)"""
+    """Execute the passed algorithm as many times as specified (with each execution in a different CPU process if indicated),
+    returning (at least) lists with the obtained solutions, values and elapsed times (one per execution).add()
+
+    If stop_if_successful = True, we will stop repetition when we have a solution that fits all the components"""
 
     # encapsulate the algorithm and its parameters in a tuple for each execution (needed for multi-processing)
     param_tuples = [
@@ -152,6 +157,7 @@ def execute_algorithm(
     # perform the calculation sequentially if multi-processing is not allowed
     else:
         for i in range(execution_num):
+            print(f"Starting execution {i}")
             (
                 solution,
                 value,
@@ -164,6 +170,10 @@ def execute_algorithm(
             value_evolutions.append(value_evolution)
             times.append(elapsed_time)
             time_divisions.append(time_division)
+
+            if stop_if_successful and value == optimal_value:
+                # Stop trying - we find a good solution
+                return solutions, values, value_evolutions, times, time_divisions
 
     return solutions, values, value_evolutions, times, time_divisions
 
@@ -230,6 +240,7 @@ def solve_packing_problem(
         calculate_times=False,
         calculate_fitness_stats=False,
         rotation=shape_rotation,
+        optimal_value=optimal_value,
     )
 
     # Choose the best solution
@@ -259,6 +270,8 @@ def solve_packing_problem(
             show_value_weight_ratio_bar=True,
         )
 
+    return solution
+
 
 if __name__ == "__main__":
     import KnapsackPacking.shapes.shape_functions as shape_functions
@@ -266,14 +279,17 @@ if __name__ == "__main__":
     container_shape = shape_functions.create_square((22.5, 22.5), 28)
     item_num = 100
     items = [shape_functions.create_square((0, 0), 4)] * item_num
-    weight_shapes = np.arange(1, item_num + 1)
+    weight_shapes = None
 
-    solve_packing_problem(
+    solution = solve_packing_problem(
         container_shape,
         items,
         weight_shapes=weight_shapes,
-        algorithm="evolutionary",
+        algorithm="greedy",
         num_repeats=1,
         num_processes=1,
         plot_sol=True,
     )
+
+    print(list(solution.placed_items.values())[0])
+    print(type(solution.placed_items))
