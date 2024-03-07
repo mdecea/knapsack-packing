@@ -196,6 +196,19 @@ def create_square(center, side):
     )
 
 
+def create_rectangle(center, side):
+    """Create a square (with conventional orientation) given its center and side lengths"""
+
+    return Polygon(
+        [
+            (center[0] - side[0] / 2, center[1] - side[1] / 2),
+            (center[0] + side[0] / 2, center[1] - side[1] / 2),
+            (center[0] + side[0] / 2, center[1] + side[1] / 2),
+            (center[0] - side[0] / 2, center[1] + side[1] / 2),
+        ]
+    )
+
+
 def create_random_triangle_in_rectangle_corner(min_x, min_y, max_x, max_y):
     """Create a triangle that lies in a corner of the rectangle defined by the passed bounds, i.e. one of the vertices of the triangle is one of the points of the rectangle, and the other two vertices lie on sides of the rectangle"""
 
